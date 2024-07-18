@@ -151,7 +151,7 @@ app.post("/uploadImage", upload.single("image"), async (req, res) => {
 
     blobStream.on("error", (err) => {
       console.error(err);
-      res.status(500).send("Failed to upload image");
+      res.status(500).send(err);
     });
 
     blobStream.on("finish", async () => {
