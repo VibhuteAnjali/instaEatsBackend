@@ -431,7 +431,11 @@ app.get("/", async (req, res) => {
   }
 });
 
-app.listen(port, async () => {
-  console.log("Server Started!");
+async function startServer() {
   await runDB();
-});
+  app.listen(port, () => {
+    console.log(`Server Started on port ${port}!`);
+  });
+}
+
+startServer();
