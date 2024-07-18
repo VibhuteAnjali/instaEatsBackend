@@ -46,9 +46,16 @@ async function runDB() {
     );
   } catch (error) {
     console.error("Failed to connect MongoDB", error);
+    process.exit(1);
   }
 }
-
+function ensureDBConnection(req, res, next) {
+  if (!profile || !posts) {
+    return res.status(500).send("Database not initialized");
+  }
+  next();
+}
+app.use(ensureDBConnection);
 // Middleware to handle file uploads and update profile picture
 app.post("/updateProfilePic", upload.single("image"), async (req, res) => {
   try {
