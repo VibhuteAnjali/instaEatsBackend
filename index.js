@@ -15,7 +15,7 @@ const app = express();
 const port = 3000;
 
 // Ensure the GOOGLE_APPLICATION_CREDENTIALS environment variable is set
-const credentialsPath = path.resolve(process.env.GOOGLE_APPLICATION_CREDENTIALS);
+const credentialsPath = path.join(__dirname, process.env.GOOGLE_APPLICATION_CREDENTIALS);
 
 if (!fs.existsSync(credentialsPath)) {
   throw new Error(`The file at ${credentialsPath} does not exist.`);
