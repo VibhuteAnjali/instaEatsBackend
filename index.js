@@ -434,10 +434,7 @@ async function startServer() {
     console.log(`Server started on port ${port}!`);
   });
 }
-runDB().then(startServer).catch(err => {
-  console.error("Failed to start server:", err);
-  process.exit(1);
-});
 
+startServer();
 // Export the app object
 export default app;
