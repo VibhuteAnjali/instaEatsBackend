@@ -22,7 +22,17 @@ app.use(express.json());
 app.use(bodyParser.json());
 const url = process.env.MONGODB_URL;
 const upload = multer({ storage: multer.memoryStorage() });
+const credentialsPath = path.resolve(process.env.GOOGLE_APPLICATION_CREDENTIALS);
 
+if (!fs.existsSync(credentialsPath)) {
+  throw new Error(`The file at ${credentialsPath} does not exist.`);
+}
+
+process.env.GOOGLE_APPLICATION_CREDENTIALS = credentialsPath;
+
+// Create a new Storage instance
+const storage = new Storage();
+const bucketName = process.env.GCLOUD_STORAGE_BUCKET;
 const client = new MongoClient(url, {
   serverApi: {
     version: ServerApiVersion.v1,
