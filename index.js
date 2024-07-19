@@ -1,4 +1,3 @@
-import { MongoClient, ServerApiVersion, ObjectId } from "mongodb";
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -8,12 +7,14 @@ import bodyParser from "body-parser";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import { MongoClient, ServerApiVersion, ObjectId } from "mongodb";
+
 dotenv.config();
 
 const app = express();
 const port = 3000;
+
 export const getGCPCredentials = () => {
-  // for Vercel, use environment variables
   return process.env.GCP_PRIVATE_KEY
     ? {
         credentials: {
@@ -22,7 +23,6 @@ export const getGCPCredentials = () => {
         },
         projectId: process.env.GCP_PROJECT_ID,
       }
-      // for local development, use gcloud CLI
     : {};
 };
 
@@ -435,4 +435,5 @@ async function startServer() {
   });
 }
 
-startServer();
+// Export the app object
+export default app;
