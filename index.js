@@ -437,3 +437,9 @@ async function startServer() {
 
 startServer();
 
+export default (req, res) => {
+  return new Promise((resolve) => {
+    app(req, res);
+    resolve();
+  });
+};
