@@ -12,24 +12,28 @@ dotenv.config();
 
 const app = express();
 const port = 3000;
-
-// Ensure the GOOGLE_APPLICATION_CREDENTIALS environment variable is set
-const credentialsPath = path.resolve(process.env.GOOGLE_APPLICATION_CREDENTIALS);
-
-
-if (!fs.existsSync(credentialsPath)) {
-  throw new Error(`The file at ${credentialsPath} does not exist.`);
-}
-
-process.env.GOOGLE_APPLICATION_CREDENTIALS = credentialsPath;
+export const getGCPCredentials = () => {
+  // for Vercel, use environment variables
+  return process.env.GCP_PRIVATE_KEY
+    ? {
+        credentials: {
+          client_email: process.env.GCP_SERVICE_ACCOUNT_EMAIL,
+          private_key: process.env.GCP_PRIVATE_KEY,
+        },
+        projectId: process.env.GCP_PROJECT_ID,
+      }
+      // for local development, use gcloud CLI
+    : {};
+};
 
 const storage = new Storage();
 const bucketName = process.env.GCLOUD_STORAGE_BUCKET;
 
+const fileName = 'instaeats-80ed1f4855d3.json';
 app.use(cors());
 app.use(express.json());
 app.use(bodyParser.json());
-
+export const storageClient = new Storage(getGCPCredentials());
 const url = process.env.MONGODB_URL;
 const upload = multer({ storage: multer.memoryStorage() });
 
