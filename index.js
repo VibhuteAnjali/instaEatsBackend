@@ -436,5 +436,4 @@ async function startServer() {
 }
 
 startServer();
-// Export the app object
-export default app;
+
