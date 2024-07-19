@@ -16,9 +16,10 @@ const port = 3000;
 const storage = new Storage();
 const bucketName = process.env.GCLOUD_STORAGE_BUCKET;
 
+app.use(cors());
+
 app.use(express.json());
 app.use(bodyParser.json());
-app.use(cors());
 const url = process.env.MONGODB_URL;
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -46,9 +47,16 @@ async function runDB() {
     );
   } catch (error) {
     console.error("Failed to connect MongoDB", error);
+    process.exit(1);
   }
 }
-
+function ensureDBConnection(req, res, next) {
+  if (!profile || !posts) {
+    return res.status(500).send("Database not initialized");
+  }
+  next();
+}
+app.use(ensureDBConnection);
 // Middleware to handle file uploads and update profile picture
 app.post("/updateProfilePic", upload.single("image"), async (req, res) => {
   try {
@@ -143,7 +151,7 @@ app.post("/uploadImage", upload.single("image"), async (req, res) => {
 
     blobStream.on("error", (err) => {
       console.error(err);
-      res.status(500).send("Failed to upload image");
+      res.status(500).send(err);
     });
 
     blobStream.on("finish", async () => {
@@ -424,7 +432,11 @@ app.get("/", async (req, res) => {
   }
 });
 
-app.listen(port, async () => {
-  console.log("Server Started!");
+async function startServer() {
   await runDB();
-});
+  app.listen(port, () => {
+    console.log(`Server Started on port ${port}!`);
+  });
+}
+
+startServer();
