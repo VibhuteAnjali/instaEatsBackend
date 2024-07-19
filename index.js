@@ -1,3 +1,4 @@
+import { MongoClient, ServerApiVersion } from "mongodb";
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -6,34 +7,19 @@ import { v4 as uuidv4 } from "uuid";
 import bodyParser from "body-parser";
 import multer from "multer";
 import path from "path";
-import fs from "fs";
-import { MongoClient, ServerApiVersion, ObjectId } from "mongodb";
 
+import { ObjectId } from "mongodb";
 dotenv.config();
 
 const app = express();
 const port = 3000;
-
-export const getGCPCredentials = () => {
-  return process.env.GCP_PRIVATE_KEY
-    ? {
-        credentials: {
-          client_email: process.env.GCP_SERVICE_ACCOUNT_EMAIL,
-          private_key: process.env.GCP_PRIVATE_KEY,
-        },
-        projectId: process.env.GCP_PROJECT_ID,
-      }
-    : {};
-};
-
 const storage = new Storage();
 const bucketName = process.env.GCLOUD_STORAGE_BUCKET;
 
-const fileName = 'instaeats-80ed1f4855d3.json';
 app.use(cors());
+
 app.use(express.json());
 app.use(bodyParser.json());
-export const storageClient = new Storage(getGCPCredentials());
 const url = process.env.MONGODB_URL;
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -64,16 +50,13 @@ async function runDB() {
     process.exit(1);
   }
 }
-
 function ensureDBConnection(req, res, next) {
   if (!profile || !posts) {
     return res.status(500).send("Database not initialized");
   }
   next();
 }
-
 app.use(ensureDBConnection);
-
 // Middleware to handle file uploads and update profile picture
 app.post("/updateProfilePic", upload.single("image"), async (req, res) => {
   try {
@@ -122,19 +105,25 @@ app.post("/edit-profile", async (req, res) => {
   const { email, bio, userName } = req.body;
 
   try {
-    const existingProfile = await profile.findOne({ email: email });
+    // Find the document to update
+    const existingProfile = await profile.find({ email: email }).toArray();
 
     if (existingProfile) {
+      // Update the document
       const result = await profile.updateOne(
         { email: email },
         { $set: { Bio: bio, userName: userName } }
       );
+      console.log(result);
       if (result.modifiedCount > 0) {
+        // If update successful, send a success response
         res.status(200).json({ message: "Profile updated successfully" });
       } else {
+        // If no documents were modified, send an error response
         res.status(500).json({ message: "Failed to update profile" });
       }
     } else {
+      // If profile not found, send a not found response
       res.status(404).json({ message: "Profile not found" });
     }
   } catch (error) {
@@ -142,7 +131,6 @@ app.post("/edit-profile", async (req, res) => {
     res.status(500).json({ message: "Internal Server Error 500" });
   }
 });
-
 app.post("/uploadImage", upload.single("image"), async (req, res) => {
   try {
     const image = req.file;
@@ -169,6 +157,7 @@ app.post("/uploadImage", upload.single("image"), async (req, res) => {
     blobStream.on("finish", async () => {
       const publicUrl = `https://storage.googleapis.com/${bucketName}/${blob.name}`;
       res.status(200).json({ url: publicUrl });
+      return publicUrl;
     });
 
     blobStream.end(image.buffer);
@@ -177,7 +166,6 @@ app.post("/uploadImage", upload.single("image"), async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 });
-
 app.post("/createPost", async (req, res) => {
   try {
     const date = new Date().toISOString();
@@ -206,9 +194,12 @@ app.post("/createPost", async (req, res) => {
       rating,
     });
 
+    console.log(newPost, "newpost");
+    console.log(profileId, "profileId");
+
     if (newPost.acknowledged) {
       const profileUpdate = await profile.updateOne(
-        { _id: new ObjectId(profileId) },
+        { _id: new ObjectId(profileId) }, // Ensure profileId is used as ObjectId
         {
           $inc: { NoPosts: 1 },
           $addToSet: { Posts: newPost.insertedId.toString() },
@@ -221,6 +212,7 @@ app.post("/createPost", async (req, res) => {
           postId: newPost.insertedId,
         });
       } else {
+        // If profile update fails, consider rolling back the post creation
         await posts.deleteOne({ _id: newPost.insertedId });
         return res.status(500).json({
           message: "Failed to update profile after creating post",
@@ -243,20 +235,22 @@ app.post("/createPost", async (req, res) => {
 app.get("/profile/:emailId", async (req, res) => {
   try {
     const { emailId } = req.params;
-    const profileInfo = await profile.findOne({ email: emailId });
+    const profileInfo = await profile.find({ email: emailId }).toArray();
+    console.log(profileInfo);
     res.json(profileInfo);
   } catch (error) {
     console.log(error);
     return res.status(500).send("Internal Error");
   }
 });
-
 app.get("/post/:postId", async (req, res) => {
   try {
     const { postId } = req.params;
+    console.log(postId);
     const objectId = new ObjectId(postId);
-    const allPosts = await posts.findOne({ _id: objectId });
-    res.json(allPosts);
+    const Allposts = await posts.find({ _id: objectId }).toArray();
+    console.log(Allposts);
+    res.json(Allposts);
   } catch (error) {
     console.log(error);
     return res.status(500).send("Internal Error");
@@ -266,6 +260,7 @@ app.get("/post/:postId", async (req, res) => {
 app.post("/DeletePost", async (req, res) => {
   try {
     const { postId } = req.body;
+    console.log(postId);
     const objectId = new ObjectId(postId);
 
     const postD = await posts.findOne({ _id: objectId });
@@ -278,6 +273,7 @@ app.post("/DeletePost", async (req, res) => {
           $inc: { NoPosts: -1 },
         }
       );
+      console.log(deletePost);
       return res.json(deletePost);
     } else {
       return res.status(404).send("Post not found");
@@ -291,13 +287,15 @@ app.post("/DeletePost", async (req, res) => {
 app.post("/DeleteProfile", async (req, res) => {
   try {
     const { profileId } = req.body;
+    console.log(profileId);
     const objectId = new ObjectId(profileId);
 
-    const profileD = await profile.findOne({ _id: objectId });
-    if (profileD) {
-      const deleteProfile = await profile.deleteOne({ _id: objectId });
-      const deletePosts = await posts.deleteMany({ profileId: objectId });
-      return res.json({ deleteProfile, deletePosts });
+    const postD = await profile.findOne({ _id: objectId });
+    if (postD) {
+      const deletePost = await profile.deleteOne({ _id: objectId });
+      const pullPost = await posts.deleteMany({ profileId: objectId });
+      console.log(deletePost);
+      return res.json(deletePost, pullPost);
     } else {
       return res.status(404).send("Profile not found");
     }
@@ -306,37 +304,37 @@ app.post("/DeleteProfile", async (req, res) => {
     return res.status(500).send("Internal Error");
   }
 });
-
 app.post("/Addlike", async (req, res) => {
   try {
     const { id, profileId } = req.body;
     const objectId = new ObjectId(id);
-    const result = await posts.updateOne(
+    const Allposts = await posts.updateOne(
       { _id: objectId },
       {
         $inc: { likes: 1 },
         $addToSet: { likeId: profileId },
       }
     );
-    res.json(result);
+    console.log(Allposts);
+    res.json(Allposts);
   } catch (error) {
     console.log(error);
     return res.status(500).send("Internal Error");
   }
 });
-
 app.post("/SavePost", async (req, res) => {
   try {
     const { postId, profileId } = req.body;
     const post = new ObjectId(postId);
     const profileIdObj = new ObjectId(profileId);
-    const result = await profile.updateOne(
+    const profileIRes = await profile.updateOne(
       { _id: profileIdObj },
       {
         $addToSet: { savedPost: post },
       }
     );
-    res.json(result);
+    console.log(profileIRes);
+    res.json(profileIRes);
   } catch (error) {
     console.log(error);
     return res.status(500).send("Internal Error");
@@ -348,13 +346,14 @@ app.post("/RemoveSavedPost", async (req, res) => {
     const { postId, profileId } = req.body;
     const post = new ObjectId(postId);
     const profileIdObj = new ObjectId(profileId);
-    const result = await profile.updateOne(
+    const profileIRes = await profile.updateOne(
       { _id: profileIdObj },
       {
         $pull: { savedPost: post },
       }
     );
-    res.json(result);
+    console.log(profileIRes);
+    res.json(profileIRes);
   } catch (error) {
     console.log(error);
     return res.status(500).send("Internal Error");
@@ -365,12 +364,14 @@ app.post("/createProfile", async (req, res) => {
   try {
     const { Name, username, profilePic, bio, email } = req.body;
 
+    // Validate input
     if (!Name || !username || !email) {
       return res
         .status(400)
         .json({ message: "Name, username, and email are required" });
     }
 
+    // Ensure email is unique
     const existingProfile = await profile.findOne({ email });
     if (existingProfile) {
       return res
@@ -378,15 +379,17 @@ app.post("/createProfile", async (req, res) => {
         .json({ message: "Profile with this email already exists" });
     }
 
+    // Insert new profile into the database
     const result = await profile.insertOne({
       Name,
       username,
       profilePic,
       Posts: [],
-      Bio: bio || "",
+      Bio: bio || "", // Default to an empty string if no bio provided
       email,
     });
 
+    // Return the created profile
     res.status(201).json({
       message: "Profile created successfully",
       profile: result,
@@ -420,8 +423,9 @@ app.get("/search", async (req, res) => {
 
 app.get("/", async (req, res) => {
   try {
-    const allPosts = await posts.find({}).toArray();
-    res.json(allPosts);
+    const Allposts = await posts.find({}).toArray();
+    console.log(Allposts);
+    res.json(Allposts);
   } catch (error) {
     console.log(error);
     return res.status(500).send("Internal Error");
@@ -431,15 +435,8 @@ app.get("/", async (req, res) => {
 async function startServer() {
   await runDB();
   app.listen(port, () => {
-    console.log(`Server started on port ${port}!`);
+    console.log(`Server Started on port ${port}!`);
   });
 }
 
 startServer();
-
-export default (req, res) => {
-  return new Promise((resolve) => {
-    app(req, res);
-    resolve();
-  });
-};
