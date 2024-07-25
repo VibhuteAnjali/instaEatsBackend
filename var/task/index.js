@@ -14,7 +14,7 @@ dotenv.config();
 const app = express();
 const port = 3000;
 // const storage = new Storage();
-export const getGCPCredentials = () => {
+const getGCPCredentials = () => {
   return process.env.GCP_PRIVATE_KEY
     ? {
         credentials: {
