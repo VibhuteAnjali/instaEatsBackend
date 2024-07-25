@@ -35,7 +35,7 @@ app.use(express.json());
 app.use(bodyParser.json());
 const url = process.env.MONGODB_URL;
 const upload = multer({ storage: multer.memoryStorage() });
-export const storage = new Storage(getGCPCredentials());
+const storage = new Storage(getGCPCredentials());
 const client = new MongoClient(url, {
   serverApi: {
     version: ServerApiVersion.v1,
