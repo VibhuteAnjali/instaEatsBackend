@@ -13,7 +13,20 @@ dotenv.config();
 
 const app = express();
 const port = 3000;
-const storage = new Storage();
+// const storage = new Storage();
+export const getGCPCredentials = () => {
+  // for Vercel, use environment variables
+  return process.env.GCP_PRIVATE_KEY
+    ? {
+        credentials: {
+          client_email: process.env.GCP_SERVICE_ACCOUNT_EMAIL,
+          private_key: process.env.GCP_PRIVATE_KEY,
+        },
+        projectId: process.env.GCP_PROJECT_ID,
+      }
+      // for local development, use gcloud CLI
+    : {};
+};
 const bucketName = process.env.GCLOUD_STORAGE_BUCKET;
 
 app.use(cors());
@@ -22,7 +35,7 @@ app.use(express.json());
 app.use(bodyParser.json());
 const url = process.env.MONGODB_URL;
 const upload = multer({ storage: multer.memoryStorage() });
-
+export const storage = new Storage(getGCPCredentials());
 const client = new MongoClient(url, {
   serverApi: {
     version: ServerApiVersion.v1,
