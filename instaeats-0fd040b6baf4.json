@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "instaeats",
+  "private_key_id": "0fd040b6baf4db36fa3bae55613f3ff4ab973c3e",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCfgtzZZtOOyQsv\nTm8KSwWNyghWs5o1qqD7Ha8I4Hv6XXomuu197oPmZ3re7GxYq/BvR07kOd5LwohR\nMk98SPbQ/cRDMM2mEZasUOQPCrKUfGBxpF4fc9iGmzfxGM+8499yx8c0TjYCU6sj\nOSCtgw2uRMzWG64I+dKW6ljvcZG1/4zRdwYKiRH1OLivtM9QGtDLhLhqOgdJZDwz\nwY7kmMtwgSNlZ5drinN2vKnQwSCtFYXiOCR40mvUW2UumzTNVmEMuKki+ZDirXYm\n43v1MahnRDFvhGvJzOoktnkqrcmGlHnA8RJOx9rczLk6WYFG7hw4kBTwn0lFU6lj\n9Q1fWkkfAgMBAAECggEAJf37zzYsFnqxFMvoK7nxsTNZKBlwFe81l4oa6hDZxqik\nEvx7235HYUXtYJJMPhR52G9SDY7w8Pd9E2XZw773NpDywZQqry7KRfGgWCrSnQZA\nzGB7YJ9th6YJvX2M4S8fRg3qVv135Lb78JBHRbyMsiDF7ws5uP6T14kqtKFGtOOv\n/9TmGn28tHgsJbxwlnSch24wcBuH8j0TeKrGa98vWL1IR4t9AqhcmLedVs8rlpq+\n7JvGcJQ+b63zLyAU9Ca6ppbcB8H0bGhpBWTzInSOcIQfI70qcNJ6jZ/60xB5P8N0\nzPNt4FW8H49u27sTCJxlNTmBBEtUHoC9eg97OzYk4QKBgQDdu9zXyRjZtaxGRI0G\nyqjPq+JIRq6XdPh9nc5Akc+LIfmbMvRvgcLd0f0XGG5BHpevr0/hlGVgLC7IghKb\nZq1NZSsmY0Q+rlaq/FuveOLCJcuUT+xdhMSkdh0zaARB8EB+cB/P1WLGuDM8I+g+\n2n5okrWrDGx9x3EsWkhvpfCoYQKBgQC4KV/cxc67M3SXQUzssZulGdmPvtj33ZaY\nTbQED4CWEr144c4o/Cqa7mxO22EPqYvoXVLDi+1WHYtusc9jwpbTlv8dCmlo1LQe\n2gnWBh3U4OOS4jxNLmjSl2h/ufcW7gy6zG5BCwTqmKOEywj7csjOsJ/rCeOGjlQL\nUlQCRWphfwKBgQCeuPjYWrJ4Pa0JS87r2qxGpFLBzB70eh3axdi7reS0QujLaQlC\nvM+CO+wA2VMrODv63fK/lpuO4XHHxByPs0tBCLd/rjVO7TtLAISdMlqYAbgd/axE\nMWMWGxrCDqZlkRaJq7eJ7cTcXUUHuuhn/b3ZG5QB0k3jJ55i0mnhyhZgYQKBgEg2\nYRKOteuN16/fuSwu0JtCsZ699RHsX7rE7UuSUJeILaeS02YayxIJX4rkVwDvOJ8a\nyPNIkP3tg9kZ+/pgOQgq80oN5RtoHGDkmmrD5zqsHFBiScbx5cR9/knnP85L9c3h\nj3INwhXDWIsfmhwO/FKfy3U8YW1HrgjqdWqWkYo9AoGBANebbBm9VrSPDnMOvRR7\nXrH0OX3AtggXgM4EVjA6//+xheIK/Rdi3xz6FCmaxvPUdmMcSZFI095RQpS5hLaF\nvOQMxetzzN4c4hoK/CqLEYLhhVLxqt1ANjoepg6JsS8Fmg0CgAuVHjquZFmNqdPp\nx8OWIWVHQdD74NH/kidPyUGY\n-----END PRIVATE KEY-----\n",
+  "client_email": "instaeatsaccount@instaeats.iam.gserviceaccount.com",
+  "client_id": "110761554292423509624",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/instaeatsaccount%40instaeats.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
